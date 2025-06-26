@@ -1,51 +1,18 @@
 <?php
 
-echo '<pre>';
-print_r($_FILES['foto']);
+require_once __DIR__ . '/app/model/GaleriaModel.php';
+require_once __DIR__ . '/app/service/ImagensUploadService.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_FILES['foto'])) {
+    if (isset($_FILES['foto']) && isset($_POST['usuario_id'])) {
         $imagem = $_FILES['foto'];
+        // to-do validar se existe o usuário
+        $usuarioId = $_POST['usuario_id'];
 
-        // tratamento para tipo de arquivos apenas imagens
-        $mimeTypesPermitidas = ['image/jpeg', 'image/png'];
-        $extensoesPermitidas = ['jpg', 'jpeg', 'png'];
+        $imagemSalva = ImagensUploadService::upload($imagem);
 
-        // se o mime da imagem não estiver na lista: erro
-        if (!in_array($imagem['type'], $mimeTypesPermitidas)) {
-            die('Tipo de arquivo iválido!');
-        }
-
-        // parse da extensão do arquivo e verifica se é valido
-        $extensaoImagem = strtolower(pathinfo(
-            $imagem['name'], 
-            PATHINFO_EXTENSION
-        ));
-        if (!in_array($extensaoImagem, $extensoesPermitidas)) {
-            die('Extensão de arquivo iválida!');
-        }
-
-        // Tratamento para o tamanho do arquivo
-        $tamanhoMaximoEmBytes = 16 * 1024 * 1024; // 16MB
-        if ($imagem['size'] > $tamanhoMaximoEmBytes) {
-            die('Tamanho da imagem inválido!');
-        }
-
-        $diretorioDestino = './uploads/';
-
-        // Tratamento caso o diretório uploads não exista
-        if (!is_dir($diretorioDestino)) {
-            mkdir($diretorioDestino);
-        }
-
-        // tratamento para manter o nome único
-        $nomeUnico = uniqid() . '_' . $imagem['name'];
-        $caminhoImagem = $diretorioDestino . $nomeUnico;
-
-        $salvou = move_uploaded_file(
-            $imagem['tmp_name'],
-            $caminhoImagem
-        );
+        $galeriaModel = new GaleriaModel();
+        $galeriaModel->salvar($imagemSalva['id'], $usuarioId);
     }
 }
 
@@ -53,17 +20,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>File Upload</title>
+
+    <style>
+        <?php require_once __DIR__ . '/app/view/assets/style.css'; ?>
+    </style>
 </head>
+
 <body>
-    <?php if ($salvou): ?>
-        <p>
-            Imagem salva com sucesso em <?= $caminhoImagem ?>.
-            <a href="index.php">Voltar</a>
-        </p>
-    <?php endif ?>
+    <section>
+        <div class="flex">
+            <p>
+                <a href="index.php">Voltar</a>
+            </p>
+        </div>
+        <?php if ($imagemSalva): ?>
+            <p>
+                Imagem salva com sucesso em <?= $imagemSalva['caminho'] ?>.
+            </p>
+        <?php endif ?>
+    </section>
 </body>
+
 </html>

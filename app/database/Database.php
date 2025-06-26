@@ -1,7 +1,7 @@
 <?php
-
 class Database
 {
+
     public static function conectar()
     {
         $host = 'localhost';
@@ -10,9 +10,7 @@ class Database
         $password = '';
         $database = 'webapp';
 
-        $connectionUrl = "mysql:host=$host;
-                          port=$port;
-                          dbname=$database;charset=utf8mb4";
+        $connectionUrl = "mysql:host=$host;port=$port;dbname=$database;charset=utf8mb4";
 
         return new PDO($connectionUrl, $username, $password);
     }

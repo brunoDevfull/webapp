@@ -3,6 +3,7 @@
 require_once __DIR__ . '/../database/Database.php';
 
 class BaseModel {
+
     protected $pdo;
     protected $tabela;
 
@@ -10,4 +11,5 @@ class BaseModel {
     {
         $this->pdo = Database::conectar();
     }
+
 }
