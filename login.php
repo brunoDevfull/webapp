@@ -17,6 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['nome'] = $usuarioValido['nome'];
             $_SESSION['email'] = $usuarioValido['email'];
             $_SESSION['imagem_perfil_caminho'] = $usuarioValido['imagem_perfil_caminho'];
+            $_SESSION['ultima_interacao'] = time(); // Define a hora da última interação no login bem-sucedido
 
             return header('Location: index.php');
         }
@@ -50,6 +51,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 Cadastrar usuário
             </a>
         </div>
+        <?php if (isset($_GET['logout_message']) && $_GET['logout_message'] === 'inactivity'): ?>
+            <p style="color: red;">Sua sessão expirou devido à inatividade. Por favor, faça login novamente.</p>
+        <?php endif; ?>
         <form action="login.php" method="POST">
             <div>
                 <label for="email">E-mail</label>

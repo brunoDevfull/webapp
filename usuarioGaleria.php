@@ -1,4 +1,24 @@
 <?php
+// inicia a sessão
+session_start();
+
+// Define o tempo limite de inatividade em segundos (5 minutos = 300 segundos)
+define('INACTIVITY_TIMEOUT', 300);
+
+if (isset($_SESSION['id']) && isset($_SESSION['ultima_interacao'])) {
+    // Verifica se o tempo de inatividade foi excedido
+    if ((time() - $_SESSION['ultima_interacao']) > INACTIVITY_TIMEOUT) {
+        // Sessão expirada, destrói a sessão e redireciona para o login com mensagem
+        session_unset();
+        session_destroy();
+        header('Location: login.php?logout_message=inactivity');
+        exit();
+    } else {
+        // Atualiza a hora da última interação
+        $_SESSION['ultima_interacao'] = time();
+    }
+}
+
 require_once __DIR__ . '/app/model/UsuariosModel.php';
 require_once __DIR__ . '/app/model/GaleriaModel.php';
 
@@ -56,6 +76,12 @@ $imagens = $galeriaModel->buscarPorUsuarioId($id);
                     <a href="<?= $imagem['imagem_caminho'] ?>" download>
                         <?= $imagem['imagem_nome_original'] ?>
                     </a>
+                    <span>
+                        Enviado por:
+                        <a href="usuarioGaleria.php?id=<?= $imagem['usuario_id'] ?>">
+                            <?= $imagem['usuario_nome'] ?>
+                        </a>
+                    </span>
                 </div>
             <?php endforeach  ?>
         </div>
